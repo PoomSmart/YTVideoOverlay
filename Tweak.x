@@ -15,8 +15,8 @@
 static const NSInteger YTVideoOverlaySection = 1222;
 
 NSMutableArray <NSString *> *tweaks;
-NSMutableDictionary <NSString *, YTQTMButton *> *topButtons;
-NSMutableDictionary <NSString *, YTQTMButton *> *bottomButtons;
+NSMutableArray <NSString *> *topButtons;
+NSMutableArray <NSString *> *bottomButtons;
 
 static NSBundle *TweakBundle(NSString *name) {
     NSString *tweakBundlePath = [[NSBundle mainBundle] pathForResource:name ofType:@"bundle"];
@@ -52,7 +52,7 @@ static BOOL UseBottomButton(NSString *name) {
 static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutableArray *controls) {
     for (NSString *name in topButtons) {
         if (UseTopButton(name))
-            [controls insertObject:topButtons[name] atIndex:0];
+            [controls insertObject:[self button:name] atIndex:0];
     }
     return controls;
 }
@@ -65,7 +65,7 @@ static YTQTMButton *createButtonTop(YTMainAppControlsOverlayView *self, NSString
     button.hidden = YES;
     button.alpha = 0;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
-    topButtons[buttonId] = button;
+    [topButtons addObject:buttonId];
     @try {
         [[self valueForKey:@"_topControlsAccessibilityContainerView"] addSubview:button];
     } @catch (id ex) {
@@ -86,7 +86,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     [button setImage:image forState:0];
     [button sizeToFit];
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
-    bottomButtons[buttonId] = button;
+    [bottomButtons addObject:buttonId];
     [self addSubview:button];
     return button;
 }
@@ -100,7 +100,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     YTMainAppVideoPlayerOverlayView *v = [self videoPlayerOverlayView];
     YTMainAppControlsOverlayView *c = [v valueForKey:@"_controlsOverlayView"];
     for (NSString *name in topButtons)
-        topButtons[name].hidden = !UseTopButton(name);
+        [c button:name].hidden = !UseTopButton(name);
     [c setNeedsLayout];
 }
 
@@ -111,6 +111,11 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 %new(@@:@@@:)
 - (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector {
     return createButtonTop(self, buttonId, accessibilityLabel, selector);
+}
+
+%new(@@:@)
+- (YTQTMButton *)button:(NSString *)tweakId {
+    return nil;
 }
 
 %new(@@:@)
@@ -129,7 +134,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 - (void)setTopOverlayVisible:(BOOL)visible isAutonavCanceledState:(BOOL)canceledState {
     CGFloat alpha = canceledState || !visible ? 0.0 : 1.0;
     for (NSString *name in topButtons)
-        topButtons[name].alpha = UseTopButton(name) ? alpha : 0;
+        [self button:name].alpha = UseTopButton(name) ? alpha : 0;
     %orig;
 }
 
@@ -147,6 +152,11 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 }
 
 %new(@@:@)
+- (YTQTMButton *)button:(NSString *)tweakId {
+    return nil;
+}
+
+%new(@@:@)
 - (UIImage *)buttonImage:(NSString *)tweakId {
     return nil;
 }
@@ -154,8 +164,11 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 - (NSMutableArray *)rightIcons {
     NSMutableArray *icons = %orig;
     for (NSString *name in bottomButtons) {
-        if (UseBottomButton(name) && ![icons containsObject:bottomButtons[name]])
-            [icons insertObject:bottomButtons[name] atIndex:0];
+        if (UseBottomButton(name)) {
+            YTQTMButton *button = [self button:name];
+            if (![icons containsObject:button])
+                [icons insertObject:button atIndex:0];
+        }
     }
     return icons;
 }
@@ -164,7 +177,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name))
-            bottomButtons[name].hidden = NO;
+            [self button:name].hidden = NO;
     }
 }
 
@@ -172,7 +185,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name))
-            bottomButtons[name].alpha = 0;
+            [self button:name].alpha = 0;
     }
 }
 
@@ -180,7 +193,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name))
-            bottomButtons[name].alpha = visible ? 1 : 0;
+            [self button:name].alpha = visible ? 1 : 0;
     }
 }
 
@@ -189,21 +202,22 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     CGFloat multiFeedWidth = [self respondsToSelector:@selector(multiFeedElementView)] ? [self multiFeedElementView].frame.size.width : 0;
     YTQTMButton *enter = [self enterFullscreenButton];
     CGFloat shift = 0;
-    CGRect frame;
+    CGRect frame = CGRectZero;
     if ([enter yt_isVisible]) {
         frame = enter.frame;
-        shift = multiFeedWidth + enter.frame.size.width + 16;
+        shift = multiFeedWidth + frame.size.width + 16;
     } else {
         YTQTMButton *exit = [self exitFullscreenButton];
         if ([exit yt_isVisible]) {
             frame = exit.frame;
-            shift = multiFeedWidth + exit.frame.size.width + 16;
+            shift = multiFeedWidth + frame.size.width + 16;
         }
     }
+    if (CGRectIsEmpty(frame)) return;
     frame.origin.x -= shift;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            bottomButtons[name].frame = frame;
+            [self button:name].frame = frame;
             frame.origin.x -= 40;
         }
     }
@@ -294,9 +308,15 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 
 %ctor {
     tweaks = [NSMutableArray array];
-    topButtons = [NSMutableDictionary dictionary];
-    bottomButtons = [NSMutableDictionary dictionary];
+    topButtons = [NSMutableArray array];
+    bottomButtons = [NSMutableArray array];
     %init(Settings);
     %init(Top);
     %init(Bottom);
+}
+
+%dtor {
+    [tweaks removeAllObjects];
+    [topButtons removeAllObjects];
+    [bottomButtons removeAllObjects];
 }

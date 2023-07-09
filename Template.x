@@ -32,6 +32,10 @@
     return self;
 }
 
+- (YTQTMButton *)button:(NSString *)tweakId {
+    return [tweakId isEqualToString:TweakKey] ? self.tweakButton : %orig;
+}
+
 - (UIImage *)buttonImage:(NSString *)tweakId {
     return [tweakId isEqualToString:TweakKey] ? <Your Tweak Button Image> : %orig;
 }
@@ -56,6 +60,10 @@
     self = %orig;
     self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
     return self;
+}
+
+- (YTQTMButton *)button:(NSString *)tweakId {
+    return [tweakId isEqualToString:TweakKey] ? self.tweakButton : %orig;
 }
 
 - (UIImage *)buttonImage:(NSString *)tweakId {

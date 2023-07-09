@@ -12,11 +12,13 @@
 @end
 
 @interface YTMainAppControlsOverlayView (YTVideoOverlay)
+- (YTQTMButton *)button:(NSString *)tweakId;
 - (UIImage *)buttonImage:(NSString *)tweakId;
 - (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
 @end
 
 @interface YTInlinePlayerBarContainerView (YTVideoOverlay)
+- (YTQTMButton *)button:(NSString *)tweakId;
 - (UIImage *)buttonImage:(NSString *)tweakId;
 - (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
 @end
