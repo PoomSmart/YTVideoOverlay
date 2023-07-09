@@ -1,0 +1,79 @@
+#import "../YTVideoOverlay/Header.h"
+#import "../YTVideoOverlay/Init.x"
+#import "../YouTubeHeader/YTMainAppVideoPlayerOverlayViewController.h"
+
+#define TweakKey "TweakKey"
+
+@interface YTMainAppControlsOverlayView (Tweak)
+@property (retain, nonatomic) YTQTMButton *tweakButton;
+- (void)didPressTweak:(id)arg;
+@end
+
+@interface YTInlinePlayerBarContainerView (Tweak)
+@property (retain, nonatomic) YTQTMButton *tweakButton;
+- (void)didPressTweak:(id)arg;
+@end
+
+%group Top
+
+%hook YTMainAppControlsOverlayView
+
+%property (retain, nonatomic) YTQTMButton *tweakButton;
+
+- (id)initWithDelegate:(id)delegate {
+    self = %orig;
+    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
+    return self;
+}
+
+- (id)initWithDelegate:(id)delegate autoplaySwitchEnabled:(BOOL)autoplaySwitchEnabled {
+    self = %orig;
+    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
+    return self;
+}
+
+- (UIImage *)buttonImage:(NSString *)tweakId {
+    return [tweakId isEqualToString:TweakKey] ? <Your Tweak Button Image> : %orig;
+}
+
+%new(v@:@)
+- (void)didPressTweak:(id)arg {
+    // Do stuff
+    [self.tweakButton setImage:<Another Tweak Button Image> forState:0];
+}
+
+%end
+
+%end
+
+%group Bottom
+
+%hook YTInlinePlayerBarContainerView
+
+%property (retain, nonatomic) YTQTMButton *tweakButton;
+
+- (id)init {
+    self = %orig;
+    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
+    return self;
+}
+
+- (UIImage *)buttonImage:(NSString *)tweakId {
+    return [tweakId isEqualToString:TweakKey] ? <Your Tweak Button Image> : %orig;
+}
+
+%new(v@:@)
+- (void)didPressTweak:(id)arg {
+    // Do stuff
+    [self.tweakButton setImage:<Another Tweak Button Image> forState:0];
+}
+
+%end
+
+%end
+
+%ctor {
+    initYTVideoOverlay(TweakKey);
+    %init(Top);
+    %init(Bottom);
+}

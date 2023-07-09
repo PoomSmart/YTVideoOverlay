@@ -1,0 +1,7 @@
+// Settings
+
+"VIDEO_OVERLAY" = "Video overlay";
+"TOP" = "Top";
+"TOP_DESC" = "At the top-right, where autoplay, captions, cast and overflow menu are.";
+"BOTTOM" = "Bottom";
+"BOTTOM_DESC" = "At the bottom-right, where fullscreen button is.";
