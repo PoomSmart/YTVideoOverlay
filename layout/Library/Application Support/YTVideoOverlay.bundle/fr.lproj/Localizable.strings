@@ -1,0 +1,7 @@
+// Settings
+
+"VIDEO_OVERLAY" = "Overlay vidéo";
+"TOP" = "Haut";
+"TOP_DESC" = "En haut à droite, où se trouvent la lecture automatique, les sous-titres, la diffusion et le menu débordement.";
+"BOTTOM" = "Bas";
+"BOTTOM_DESC" = "En bas à droite, où se trouve le bouton plein écran.";
