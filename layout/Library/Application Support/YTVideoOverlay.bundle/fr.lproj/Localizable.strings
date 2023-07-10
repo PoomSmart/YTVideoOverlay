@@ -2,6 +2,6 @@
 
 "VIDEO_OVERLAY" = "Overlay vidéo";
 "TOP" = "Haut";
-"TOP_DESC" = "En haut à droite, où se trouvent la lecture automatique, les sous-titres, la diffusion et le menu débordement.";
+"TOP_DESC" = "En haut à droite, où se trouvent la lecture automatique, les sous-titres, l'envoi vers TV et le menu overflow";
 "BOTTOM" = "Bas";
 "BOTTOM_DESC" = "En bas à droite, où se trouve le bouton plein écran.";
