@@ -166,8 +166,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
             YTQTMButton *button = [self button:name];
-            if (![icons containsObject:button])
-                [icons insertObject:button atIndex:0];
+            [icons insertObject:button atIndex:0];
         }
     }
     return icons;
@@ -213,7 +212,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
             shift = multiFeedWidth + frame.size.width + 16;
         }
     }
-    if (CGRectIsEmpty(frame)) return;
+    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y <= 0) return;
     frame.origin.x -= shift;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
