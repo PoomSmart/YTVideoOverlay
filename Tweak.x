@@ -65,7 +65,8 @@ static YTQTMButton *createButtonTop(YTMainAppControlsOverlayView *self, NSString
     button.hidden = YES;
     button.alpha = 0;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
-    [topButtons addObject:buttonId];
+    if (![topButtons containsObject:buttonId])
+        [topButtons addObject:buttonId];
     @try {
         [[self valueForKey:@"_topControlsAccessibilityContainerView"] addSubview:button];
     } @catch (id ex) {
@@ -86,7 +87,8 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     [button setImage:image forState:0];
     [button sizeToFit];
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
-    [bottomButtons addObject:buttonId];
+    if (![bottomButtons containsObject:buttonId])
+        [bottomButtons addObject:buttonId];
     [self addSubview:button];
     return button;
 }
