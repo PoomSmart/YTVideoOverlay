@@ -1,7 +1,7 @@
 // Settings
 
-"VIDEO_OVERLAY" = "Video overlay";
+"VIDEO_OVERLAY" = "動画のオーバーレイ";
 "TOP" = "上部";
-"TOP_DESC" = "右上, 自動再生, キャプション, キャストとオーバーフローメニューがある場所.";
+"TOP_DESC" = "右上。自動再生、キャプション、キャスト、オーバーフローメニューがある位置。";
 "BOTTOM" = "下部";
-"BOTTOM_DESC" = "右下, フルスクリーンボタンがある場所.";
+"BOTTOM_DESC" = "右下。フルスクリーンボタンがある位置。";
