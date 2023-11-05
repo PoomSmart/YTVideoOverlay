@@ -220,6 +220,7 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
         if (UseBottomButton(name)) {
             [self button:name].frame = frame;
             frame.origin.x -= 40;
+            if (frame.origin.x < 0) frame.origin.x = 0;
         }
     }
 }
