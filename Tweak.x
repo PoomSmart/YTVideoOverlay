@@ -182,6 +182,14 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     }
 }
 
+- (void)updateIconsHiddenAttribute {
+    %orig;
+    for (NSString *name in bottomButtons) {
+        if (UseBottomButton(name))
+            [self button:name].hidden = NO;
+    }
+}
+
 - (void)hideScrubber {
     %orig;
     for (NSString *name in bottomButtons) {
