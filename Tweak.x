@@ -214,20 +214,20 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     CGRect frame = CGRectZero;
     if ([enter yt_isVisible]) {
         frame = enter.frame;
-        shift = multiFeedWidth + frame.size.width + 16;
+        shift = multiFeedWidth + (2 * frame.size.width);
     } else {
         YTQTMButton *exit = [self exitFullscreenButton];
         if ([exit yt_isVisible]) {
             frame = exit.frame;
-            shift = multiFeedWidth + frame.size.width + 16;
+            shift = multiFeedWidth + (2 * frame.size.width);
         }
     }
-    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y <= 0) return;
+    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y < -4) return;
     frame.origin.x -= shift;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
             [self button:name].frame = frame;
-            frame.origin.x -= 40;
+            frame.origin.x -= (2 * frame.size.width);
             if (frame.origin.x < 0) frame.origin.x = 0;
         }
     }
