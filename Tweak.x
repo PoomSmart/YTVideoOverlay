@@ -301,7 +301,11 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
             }];
         [sectionItems addObject:position];
     }
-    [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:LOC(@"VIDEO_OVERLAY") titleDescription:nil headerHidden:NO];
+    NSString *title = LOC(@"VIDEO_OVERLAY");
+    if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)])
+        [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:title icon:nil titleDescription:nil headerHidden:NO];
+    else
+        [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:title titleDescription:nil headerHidden:NO];
 }
 
 - (void)updateSectionForCategory:(NSUInteger)category withEntry:(id)entry {
