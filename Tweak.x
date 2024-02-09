@@ -214,6 +214,14 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     }
 }
 
+- (void)peekWithShowScrubber:(BOOL)scrubber setControlsAbovePlayerBarVisible:(BOOL)visible {
+    %orig;
+    for (NSString *name in bottomButtons) {
+        if (UseBottomButton(name))
+            [self button:name].alpha = visible ? 1 : 0;
+    }
+}
+
 - (void)layoutSubviews {
     %orig;
     CGFloat multiFeedWidth = [self respondsToSelector:@selector(multiFeedElementView)] ? [self multiFeedElementView].frame.size.width : 0;
