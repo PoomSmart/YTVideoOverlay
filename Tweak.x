@@ -198,6 +198,14 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
     }
 }
 
+- (void)setPeekableViewVisible:(BOOL)visible {
+    %orig;
+    for (NSString *name in bottomButtons) {
+        if (UseBottomButton(name))
+            [self button:name].alpha = visible ? 1 : 0;
+    }
+}
+
 - (void)setPeekableViewVisible:(BOOL)visible fullscreenButtonVisibleShouldMatchPeekableView:(BOOL)match {
     %orig;
     for (NSString *name in bottomButtons) {
