@@ -1,6 +1,6 @@
 #import <rootless.h>
 #import <dlfcn.h>
-#import "../YouTubeHeader/YTSettingsSectionItemManager.h"
+#import <YouTubeHeader/YTSettingsSectionItemManager.h>
 
 @interface YTSettingsSectionItemManager (YTVideoOverlayInit)
 + (void)registerTweak:(NSString *)tweakId;

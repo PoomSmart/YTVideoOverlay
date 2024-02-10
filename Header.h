@@ -1,11 +1,11 @@
 #import <rootless.h>
 #import <dlfcn.h>
-#import "../YouTubeHeader/YTInlinePlayerBarContainerView.h"
-#import "../YouTubeHeader/YTMainAppControlsOverlayView.h"
-#import "../YouTubeHeader/YTSettingsSectionItemManager.h"
-#import "../YouTubeHeader/QTMIcon.h"
-#import "../YouTubeHeader/YTQTMButton.h"
-#import "../YouTubeHeader/UIView+YouTube.h"
+#import <YouTubeHeader/YTInlinePlayerBarContainerView.h>
+#import <YouTubeHeader/YTMainAppControlsOverlayView.h>
+#import <YouTubeHeader/YTSettingsSectionItemManager.h>
+#import <YouTubeHeader/QTMIcon.h>
+#import <YouTubeHeader/YTQTMButton.h>
+#import <YouTubeHeader/UIView+YouTube.h>
 
 @interface YTSettingsSectionItemManager (YTVideoOverlay)
 - (void)updateYTVideoOverlaySectionWithEntry:(id)entry;

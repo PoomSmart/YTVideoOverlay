@@ -1,6 +1,6 @@
 #import "../YTVideoOverlay/Header.h"
 #import "../YTVideoOverlay/Init.x"
-#import "../YouTubeHeader/YTMainAppVideoPlayerOverlayViewController.h"
+#import <YouTubeHeader/YTMainAppVideoPlayerOverlayViewController.h>
 
 #define TweakKey "TweakKey"
 
