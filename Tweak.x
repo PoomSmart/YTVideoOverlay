@@ -9,7 +9,7 @@
 #import <YouTubeHeader/YTQTMButton.h>
 #import <YouTubeHeader/QTMIcon.h>
 #import <YouTubeHeader/MLFormat.h>
-#import "../YouTubeHeader/UIView+YouTube.h"
+#import <YouTubeHeader/UIView+YouTube.h>
 #import "Header.h"
 
 static const NSInteger YTVideoOverlaySection = 1222;
