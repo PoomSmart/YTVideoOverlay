@@ -57,11 +57,20 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
     return controls;
 }
 
-static YTQTMButton *createButtonTop(YTMainAppControlsOverlayView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
+static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
     if (!self) return nil;
     CGFloat padding = [[self class] topButtonAdditionalPadding];
-    UIImage *image = [self buttonImage:buttonId];
-    YTQTMButton *button = [self buttonWithImage:image accessibilityLabel:accessibilityLabel verticalContentPadding:padding];
+    YTQTMButton *button;
+    if (isText) {
+        button = [%c(YTQTMButton) textButton];
+        button.accessibilityLabel = accessibilityLabel;
+        button.verticalContentPadding = padding;
+        [button setTitle:@"Auto" forState:0];
+        [button sizeToFit];
+    } else {
+        UIImage *image = [self buttonImage:buttonId];
+        button = [self buttonWithImage:image accessibilityLabel:accessibilityLabel verticalContentPadding:padding];
+    }
     button.hidden = YES;
     button.alpha = 0;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
@@ -75,17 +84,23 @@ static YTQTMButton *createButtonTop(YTMainAppControlsOverlayView *self, NSString
     return button;
 }
 
-static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
+static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
     if (!self) return nil;
-    UIImage *image = [self buttonImage:buttonId];
-    YTQTMButton *button = [%c(YTQTMButton) iconButton];
+    YTQTMButton *button;
+    if (isText) {
+        button = [%c(YTQTMButton) textButton];
+        button.accessibilityLabel = accessibilityLabel;
+    } else {
+        UIImage *image = [self buttonImage:buttonId];
+        button = [%c(YTQTMButton) iconButton];
+        [button setImage:image forState:0];
+        [button sizeToFit];
+    }
     button.hidden = YES;
     button.exclusiveTouch = YES;
     button.alpha = 0;
     button.minHitTargetSize = 60;
     button.accessibilityLabel = accessibilityLabel;
-    [button setImage:image forState:0];
-    [button sizeToFit];
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
     if (![bottomButtons containsObject:buttonId])
         [bottomButtons addObject:buttonId];
@@ -112,7 +127,12 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 
 %new(@@:@@@:)
 - (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector {
-    return createButtonTop(self, buttonId, accessibilityLabel, selector);
+    return createButtonTop(NO, self, buttonId, accessibilityLabel, selector);
+}
+
+%new(@@:@@@:)
+- (YTQTMButton *)createTextButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector {
+    return createButtonTop(YES, self, buttonId, accessibilityLabel, selector);
 }
 
 %new(@@:@)
@@ -150,7 +170,12 @@ static YTQTMButton *createButtonBottom(YTInlinePlayerBarContainerView *self, NSS
 
 %new(@@:@@@:)
 - (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector {
-    return createButtonBottom(self, buttonId, accessibilityLabel, selector);
+    return createButtonBottom(NO, self, buttonId, accessibilityLabel, selector);
+}
+
+%new(@@:@@@:)
+- (YTQTMButton *)createTextButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector {
+    return createButtonBottom(YES, self, buttonId, accessibilityLabel, selector);
 }
 
 %new(@@:@)
