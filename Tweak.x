@@ -343,9 +343,11 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
         [sectionItems addObject:position];
     }
     NSString *title = LOC(@"VIDEO_OVERLAY");
-    if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)])
-        [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:title icon:nil titleDescription:nil headerHidden:NO];
-    else
+    if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)]) {
+        YTIIcon *icon = [%c(YTIIcon) new];
+        icon.iconType = YT_TV;
+        [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:title icon:icon titleDescription:nil headerHidden:NO];
+    } else
         [settingsViewController setSectionItems:sectionItems forCategory:YTVideoOverlaySection title:title titleDescription:nil headerHidden:NO];
 }
 
