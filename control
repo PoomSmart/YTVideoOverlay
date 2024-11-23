@@ -6,6 +6,6 @@ Description: A helper tweak to add buttons on YouTube video overlay.
 Maintainer: PoomSmart
 Author: PoomSmart
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 11.0)
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 11.0), com.ps.yougroupsettings
 Depiction: https://poomsmart.github.io/repo/depictions/ytvideooverlay.html
 SileoDepiction: https://poomsmart.github.io/repo/sileodepictions/ytvideooverlay.json
