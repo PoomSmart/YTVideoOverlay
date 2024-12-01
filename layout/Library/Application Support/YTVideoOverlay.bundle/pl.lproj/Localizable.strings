@@ -1,0 +1,7 @@
+// Settings
+
+"VIDEO_OVERLAY" = "Nakładka odtwarzacza";
+"TOP" = "Góra";
+"TOP_DESC" = "W prawym górnym rogu gdzie znajdują się napisy, rozwijane menu itp.";
+"BOTTOM" = "Dół";
+"BOTTOM_DESC" = "At the bottom-right, where fullscreen button is.";
