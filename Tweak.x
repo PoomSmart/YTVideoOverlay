@@ -1,16 +1,17 @@
+#import <YouTubeHeader/MLFormat.h>
+#import <YouTubeHeader/QTMIcon.h>
+#import <YouTubeHeader/UIView+YouTube.h>
 #import <YouTubeHeader/YTColor.h>
 #import <YouTubeHeader/YTCommonUtils.h>
 #import <YouTubeHeader/YTMainAppVideoPlayerOverlayViewController.h>
-#import <YouTubeHeader/YTSingleVideoController.h>
+#import <YouTubeHeader/YTQTMButton.h>
 #import <YouTubeHeader/YTSettingsGroupData.h>
 #import <YouTubeHeader/YTSettingsPickerViewController.h>
-#import <YouTubeHeader/YTSettingsViewController.h>
 #import <YouTubeHeader/YTSettingsSectionItem.h>
 #import <YouTubeHeader/YTSettingsSectionItemManager.h>
-#import <YouTubeHeader/YTQTMButton.h>
-#import <YouTubeHeader/QTMIcon.h>
-#import <YouTubeHeader/MLFormat.h>
-#import <YouTubeHeader/UIView+YouTube.h>
+#import <YouTubeHeader/YTSettingsViewController.h>
+#import <YouTubeHeader/YTSingleVideoController.h>
+#import <YouTubeHeader/YTTypeStyle.h>
 #import "Header.h"
 
 static const NSInteger YTVideoOverlaySection = 1222;
@@ -58,6 +59,17 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
     return controls;
 }
 
+static void setDefaultTextStyle(YTQTMButton *button) {
+    [button setTitleColor:[%c(YTColor) white1] forState:0];
+    YTDefaultTypeStyle *defaultTypeStyle = [%c(YTTypeStyle) defaultTypeStyle];
+    UIFont *font = [defaultTypeStyle respondsToSelector:@selector(ytSansFontOfSize:weight:)]
+        ? [defaultTypeStyle ytSansFontOfSize:10 weight:UIFontWeightSemibold]
+        : [defaultTypeStyle fontOfSize:10 weight:UIFontWeightSemibold];
+    button.titleLabel.font = font;
+    button.titleLabel.numberOfLines = 3;
+    button.titleLabel.textAlignment = NSTextAlignmentCenter;
+}
+
 static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
     if (!self) return nil;
     CGFloat padding = [[self class] topButtonAdditionalPadding];
@@ -68,6 +80,7 @@ static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *s
         button.verticalContentPadding = padding;
         [button setTitle:@"Auto" forState:0];
         [button sizeToFit];
+        setDefaultTextStyle(button);
     } else {
         UIImage *image = [self buttonImage:buttonId];
         button = [self buttonWithImage:image accessibilityLabel:accessibilityLabel verticalContentPadding:padding];
@@ -91,6 +104,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     if (isText) {
         button = [%c(YTQTMButton) textButton];
         button.accessibilityLabel = accessibilityLabel;
+        setDefaultTextStyle(button);
     } else {
         UIImage *image = [self buttonImage:buttonId];
         button = [%c(YTQTMButton) iconButton];
@@ -295,13 +309,15 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %hook YTAppSettingsPresentationData
 
-+ (NSArray *)settingsCategoryOrder {
-    NSArray *order = %orig;
-    NSMutableArray *mutableOrder = [order mutableCopy];
++ (NSArray <NSNumber *> *)settingsCategoryOrder {
+    NSArray <NSNumber *> *order = %orig;
     NSUInteger insertIndex = [order indexOfObject:@(1)];
-    if (insertIndex != NSNotFound)
+    if (insertIndex != NSNotFound) {
+        NSMutableArray <NSNumber *> *mutableOrder = [order mutableCopy];
         [mutableOrder insertObject:@(YTVideoOverlaySection) atIndex:insertIndex + 1];
-    return mutableOrder;
+        order = mutableOrder.copy;
+    }
+    return order;
 }
 
 %end
