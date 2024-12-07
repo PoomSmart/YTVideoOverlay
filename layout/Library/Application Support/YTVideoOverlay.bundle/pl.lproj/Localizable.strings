@@ -1,7 +1,9 @@
 // Settings
 
+"ENABLED" = "Pokaż przycisk wyboru jakości";
+"POSITION" = "Pozycja przycisku jakości";
 "VIDEO_OVERLAY" = "Nakładka odtwarzacza";
 "TOP" = "Góra";
 "TOP_DESC" = "W prawym górnym rogu gdzie znajdują się napisy, rozwijane menu itp.";
 "BOTTOM" = "Dół";
-"BOTTOM_DESC" = "At the bottom-right, where fullscreen button is.";
+"BOTTOM_DESC" = "W prawym dolnym rogu, tam gdzie znajduje się przycisk pełnego ekranu.";

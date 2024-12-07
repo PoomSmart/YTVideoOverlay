@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video-Overlay";
 "TOP" = "Oben";
 "TOP_DESC" = "Oben rechts, wo sich Autoplay, Untertitel, Cast und Overflow-Menü befinden.";

@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video overlay";
 "TOP" = "顶部";
 "TOP_DESC" = "在右上角，自动播放、字幕等按钮所在位置。";

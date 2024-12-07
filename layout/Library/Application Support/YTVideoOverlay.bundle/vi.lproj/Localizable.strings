@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Lớp phủ video";
 "TOP" = "Trên";
 "TOP_DESC" = "Ở phía trên bên phải, nơi có menu tự động phát, phụ đề, truyền và mục bổ sung.";

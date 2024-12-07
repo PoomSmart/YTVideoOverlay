@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Oynatıcı Kaplaması.";
 "TOP" = "Üst";
 "TOP_DESC" = "Sağ üstte, otomatik oynatma, altyazılar, yayınlama ve taşma menüsünün bulunduğu yer.";

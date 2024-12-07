@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video overlay";
 "TOP" = "Top";
 "TOP_DESC" = "At the top-right, where autoplay, captions, cast and overflow menu are.";

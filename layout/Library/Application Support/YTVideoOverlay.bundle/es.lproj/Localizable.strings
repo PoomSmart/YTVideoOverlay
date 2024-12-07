@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video overlay";
 "TOP" = "Arriba";
 "TOP_DESC" = "En la parte superior derecha, donde están la reproducción automática, los subtítulos, el reparto y el menú de desbordamiento.";

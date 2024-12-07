@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video overlay";
 "TOP" = "الأعلى";
 "TOP_DESC" = "في الجزء العلوي الأيمن، حيث يوجد زر التشغيل التلقائي وزر البث وغيرها.";

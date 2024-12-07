@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "Video overlay";
 "TOP" = "Сверху";
 "TOP_DESC" = "В правом верхнем углу, рядом с кнопками Автовоспроизведения, Субтитров и выпадающего меню.";

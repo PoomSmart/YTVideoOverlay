@@ -1,5 +1,7 @@
 // Settings
 
+"ENABLED" = "Show quality button";
+"POSITION" = "Quality button position";
 "VIDEO_OVERLAY" = "動画のオーバーレイ";
 "TOP" = "上部";
 "TOP_DESC" = "右上。自動再生、キャプション、キャスト、オーバーフローメニューがある位置。";

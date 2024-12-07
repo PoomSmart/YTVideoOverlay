@@ -337,7 +337,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     YTSettingsViewController *settingsViewController = [self valueForKey:@"_settingsViewControllerDelegate"];
     for (NSString *name in tweaks) {
         NSBundle *bundle = TweakBundle(name);
-        YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, @"ENABLED")
+        YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(@"ENABLED")
             titleDescription:nil
             accessibilityIdentifier:nil
             switchOn:TweakEnabled(name)
@@ -347,7 +347,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
             }
             settingItemId:0];
         [sectionItems addObject:master];
-        YTSettingsSectionItem *position = [YTSettingsSectionItemClass itemWithTitle:_LOC(bundle, @"POSITION")
+        YTSettingsSectionItem *position = [YTSettingsSectionItemClass itemWithTitle:_LOC(@"POSITION")
             accessibilityIdentifier:nil
             detailTextBlock:^NSString *() {
                 return ButtonPosition(name) ? LOC(@"BOTTOM") : LOC(@"TOP");
