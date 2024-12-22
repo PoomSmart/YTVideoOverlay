@@ -18,7 +18,7 @@
 static const NSInteger YTVideoOverlaySection = 1222;
 
 NSMutableArray <NSString *> *tweaks;
-NSMutableArray <NSString *> *tweaksWithOwnToggle;
+NSMutableDictionary <NSString *, NSString *> *tweaksWithEnabledKey;
 NSMutableArray <NSString *> *topButtons;
 NSMutableArray <NSString *> *bottomButtons;
 
@@ -30,7 +30,7 @@ static NSBundle *TweakBundle(NSString *name) {
 }
 
 static NSString *EnabledKey(NSString *name) {
-    return [NSString stringWithFormat:@"YTVideoOverlay-%@-Enabled", name];
+    return tweaksWithEnabledKey[name] ?: [NSString stringWithFormat:@"YTVideoOverlay-%@-Enabled", name];
 }
 
 static BOOL TweakEnabled(NSString *name) {
@@ -331,10 +331,10 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     [tweaks addObject:tweakId];
 }
 
-%new(v@:@B)
-+ (void)setTweak:(NSString *)tweakId hasOwnToggle:(BOOL)hasOwnToggle {
-    if (hasOwnToggle)
-        [tweaksWithOwnToggle addObject:tweakId];
+%new(v@:@@)
++ (void)setTweak:(NSString *)tweakId withEnabledKey:(NSString *)enabledKey {
+    if (enabledKey.length)
+        tweaksWithEnabledKey[tweakId] = enabledKey;
 }
 
 %new(v@:@)
@@ -351,7 +351,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
             selectBlock:nil];
         header.enabled = NO;
         [sectionItems addObject:header];
-        if (![tweaksWithOwnToggle containsObject:name]) {
+        if (tweaksWithEnabledKey[name] == nil) {
             YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, @"ENABLED")
                 titleDescription:nil
                 accessibilityIdentifier:nil
@@ -410,7 +410,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %ctor {
     tweaks = [NSMutableArray array];
-    tweaksWithOwnToggle = [NSMutableArray array];
+    tweaksWithEnabledKey = [NSMutableDictionary dictionary];
     topButtons = [NSMutableArray array];
     bottomButtons = [NSMutableArray array];
     %init(Settings);
@@ -420,7 +420,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %dtor {
     [tweaks removeAllObjects];
-    [tweaksWithOwnToggle removeAllObjects];
+    [tweaksWithEnabledKey removeAllObjects];
     [topButtons removeAllObjects];
     [bottomButtons removeAllObjects];
 }
