@@ -13,10 +13,12 @@
 #import <YouTubeHeader/YTSingleVideoController.h>
 #import <YouTubeHeader/YTTypeStyle.h>
 #import "Header.h"
+#import "Init.h"
 
 static const NSInteger YTVideoOverlaySection = 1222;
 
 NSMutableArray <NSString *> *tweaks;
+NSMutableArray <NSString *> *tweaksWithOwnToggle;
 NSMutableArray <NSString *> *topButtons;
 NSMutableArray <NSString *> *bottomButtons;
 
@@ -329,6 +331,12 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     [tweaks addObject:tweakId];
 }
 
+%new(v@:@B)
++ (void)setTweak:(NSString *)tweakId hasOwnToggle:(BOOL)hasOwnToggle {
+    if (hasOwnToggle)
+        [tweaksWithOwnToggle addObject:tweakId];
+}
+
 %new(v@:@)
 - (void)updateYTVideoOverlaySectionWithEntry:(id)entry {
     NSMutableArray *sectionItems = [NSMutableArray array];
@@ -337,16 +345,24 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     YTSettingsViewController *settingsViewController = [self valueForKey:@"_settingsViewControllerDelegate"];
     for (NSString *name in tweaks) {
         NSBundle *bundle = TweakBundle(name);
-        YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, @"ENABLED")
-            titleDescription:nil
+        YTSettingsSectionItem *header = [YTSettingsSectionItemClass itemWithTitle:name
             accessibilityIdentifier:nil
-            switchOn:TweakEnabled(name)
-            switchBlock:^BOOL (YTSettingsCell *cell, BOOL enabled) {
-                [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:EnabledKey(name)];
-                return YES;
-            }
-            settingItemId:0];
-        [sectionItems addObject:master];
+            detailTextBlock:nil
+            selectBlock:nil];
+        header.enabled = NO;
+        [sectionItems addObject:header];
+        if (![tweaksWithOwnToggle containsObject:name]) {
+            YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, @"ENABLED")
+                titleDescription:nil
+                accessibilityIdentifier:nil
+                switchOn:TweakEnabled(name)
+                switchBlock:^BOOL (YTSettingsCell *cell, BOOL enabled) {
+                    [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:EnabledKey(name)];
+                    return YES;
+                }
+                settingItemId:0];
+            [sectionItems addObject:master];
+        }
         YTSettingsSectionItem *position = [YTSettingsSectionItemClass itemWithTitle:_LOC(bundle, @"POSITION")
             accessibilityIdentifier:nil
             detailTextBlock:^NSString *() {
@@ -394,6 +410,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %ctor {
     tweaks = [NSMutableArray array];
+    tweaksWithOwnToggle = [NSMutableArray array];
     topButtons = [NSMutableArray array];
     bottomButtons = [NSMutableArray array];
     %init(Settings);
@@ -403,6 +420,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %dtor {
     [tweaks removeAllObjects];
+    [tweaksWithOwnToggle removeAllObjects];
     [topButtons removeAllObjects];
     [bottomButtons removeAllObjects];
 }
