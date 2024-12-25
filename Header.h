@@ -12,17 +12,13 @@
 @end
 
 @interface YTMainAppControlsOverlayView (YTVideoOverlay)
-- (YTQTMButton *)button:(NSString *)tweakId;
+@property (retain, nonatomic) NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons;
 - (UIImage *)buttonImage:(NSString *)tweakId;
-- (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
-- (YTQTMButton *)createTextButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
 @end
 
 @interface YTInlinePlayerBarContainerView (YTVideoOverlay)
-- (YTQTMButton *)button:(NSString *)tweakId;
+@property (retain, nonatomic) NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons;
 - (UIImage *)buttonImage:(NSString *)tweakId;
-- (YTQTMButton *)createButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
-- (YTQTMButton *)createTextButton:(NSString *)buttonId accessibilityLabel:(NSString *)accessibilityLabel selector:(SEL)selector;
 @end
 
 #define _LOC(b, x) [b localizedStringForKey:x value:nil table:nil]

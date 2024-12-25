@@ -5,12 +5,10 @@
 #define TweakKey "TweakKey"
 
 @interface YTMainAppControlsOverlayView (Tweak)
-@property (retain, nonatomic) YTQTMButton *tweakButton;
 - (void)didPressTweak:(id)arg;
 @end
 
 @interface YTInlinePlayerBarContainerView (Tweak)
-@property (retain, nonatomic) YTQTMButton *tweakButton;
 - (void)didPressTweak:(id)arg;
 @end
 
@@ -18,24 +16,7 @@
 
 %hook YTMainAppControlsOverlayView
 
-%property (retain, nonatomic) YTQTMButton *tweakButton;
-
-- (id)initWithDelegate:(id)delegate {
-    self = %orig;
-    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
-    return self;
-}
-
-- (id)initWithDelegate:(id)delegate autoplaySwitchEnabled:(BOOL)autoplaySwitchEnabled {
-    self = %orig;
-    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
-    return self;
-}
-
-- (YTQTMButton *)button:(NSString *)tweakId {
-    return [tweakId isEqualToString:TweakKey] ? self.tweakButton : %orig;
-}
-
+// Remove this method if your button is a text button
 - (UIImage *)buttonImage:(NSString *)tweakId {
     return [tweakId isEqualToString:TweakKey] ? <Your Tweak Button Image> : %orig;
 }
@@ -43,7 +24,7 @@
 %new(v@:@)
 - (void)didPressTweak:(id)arg {
     // Do stuff
-    [self.tweakButton setImage:<Another Tweak Button Image> forState:0];
+    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:0];
 }
 
 %end
@@ -54,18 +35,7 @@
 
 %hook YTInlinePlayerBarContainerView
 
-%property (retain, nonatomic) YTQTMButton *tweakButton;
-
-- (id)init {
-    self = %orig;
-    self.tweakButton = [self createButton:TweakKey accessibilityLabel:@"Tweak" selector:@selector(didPressTweak:)];
-    return self;
-}
-
-- (YTQTMButton *)button:(NSString *)tweakId {
-    return [tweakId isEqualToString:TweakKey] ? self.tweakButton : %orig;
-}
-
+// Remove this method if your button is a text button
 - (UIImage *)buttonImage:(NSString *)tweakId {
     return [tweakId isEqualToString:TweakKey] ? <Your Tweak Button Image> : %orig;
 }
@@ -73,7 +43,7 @@
 %new(v@:@)
 - (void)didPressTweak:(id)arg {
     // Do stuff
-    [self.tweakButton setImage:<Another Tweak Button Image> forState:0];
+    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:0];
 }
 
 %end
@@ -81,7 +51,13 @@
 %end
 
 %ctor {
-    initYTVideoOverlay(TweakKey);
+    initYTVideoOverlay(TweakKey, @{
+        AccessibilityLabelKey: @"Tweak",
+        SelectorKey: @"didPressTweak:",
+        // AsTextKey: @YES, // If yes, the button is rendered as a text button
+        // ToggleKey: @YES, // If yes, the toggle setting is hidden from YTVideoOverlay settings
+        // UpdateImageOnVisibleKey: @YES, // If yes, the button image is assigned again when the button is visible
+    });
     %init(Top);
     %init(Bottom);
 }
