@@ -17,7 +17,6 @@
 
 static const NSInteger YTVideoOverlaySection = 1222;
 
-NSMutableArray <NSString *> *tweaks;
 NSMutableDictionary <NSString *, NSDictionary *> *tweaksMetadata;
 NSMutableArray <NSString *> *topButtons;
 NSMutableArray <NSString *> *bottomButtons;
@@ -142,7 +141,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOOL isTop, id self) {
     NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons = [NSMutableDictionary dictionary];
-    for (NSString *name in tweaks) {
+    for (NSString *name in [tweaksMetadata allKeys]) {
         NSDictionary *metadata = tweaksMetadata[name];
         SEL selector = NSSelectorFromString(metadata[SelectorKey]);
         BOOL asText = [metadata[AsTextKey] boolValue];
@@ -190,12 +189,6 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
     CGFloat alpha = canceledState || !visible ? 0.0 : 1.0;
     for (NSString *name in topButtons)
         self.overlayButtons[name].alpha = UseTopButton(name) ? alpha : 0;
-    %orig;
-}
-
-- (void)dealloc {
-    [self.overlayButtons removeAllObjects];
-    self.overlayButtons = nil;
     %orig;
 }
 
@@ -314,12 +307,6 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
     }
 }
 
-- (void)dealloc {
-    [self.overlayButtons removeAllObjects];
-    self.overlayButtons = nil;
-    %orig;
-}
-
 %end
 
 %end
@@ -357,7 +344,6 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
 
 %new(v@:@@)
 + (void)registerTweak:(NSString *)tweakId metadata:(NSDictionary *)metadata {
-    [tweaks addObject:tweakId];
     tweaksMetadata[tweakId] = metadata;
 }
 
@@ -367,7 +353,7 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
     NSBundle *tweakBundle = TweakBundle(@"YTVideoOverlay");
     Class YTSettingsSectionItemClass = %c(YTSettingsSectionItem);
     YTSettingsViewController *settingsViewController = [self valueForKey:@"_settingsViewControllerDelegate"];
-    for (NSString *name in tweaks) {
+    for (NSString *name in [tweaksMetadata allKeys]) {
         NSBundle *bundle = TweakBundle(name);
         YTSettingsSectionItem *header = [YTSettingsSectionItemClass itemWithTitle:name
             accessibilityIdentifier:nil
@@ -433,7 +419,6 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
 %end
 
 %ctor {
-    tweaks = [NSMutableArray array];
     tweaksMetadata = [NSMutableDictionary dictionary];
     topButtons = [NSMutableArray array];
     bottomButtons = [NSMutableArray array];
@@ -443,7 +428,6 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
 }
 
 %dtor {
-    [tweaks removeAllObjects];
     [tweaksMetadata removeAllObjects];
     [topButtons removeAllObjects];
     [bottomButtons removeAllObjects];
