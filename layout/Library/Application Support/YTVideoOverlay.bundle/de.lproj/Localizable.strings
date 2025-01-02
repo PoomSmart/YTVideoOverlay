@@ -5,3 +5,5 @@
 "TOP_DESC" = "Oben rechts, wo sich Autoplay, Untertitel, Cast und Overflow-Menü befinden.";
 "BOTTOM" = "Unten";
 "BOTTOM_DESC" = "Unten rechts, wo sich die Schaltfläche für den Vollbildmodus befindet.";
+"ORDER" = "Bestellen";
+"ORDER_NONE" = "Nicht festgelegt";

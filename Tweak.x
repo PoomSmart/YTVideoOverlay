@@ -44,6 +44,14 @@ static int ButtonPosition(NSString *name) {
     return [[NSUserDefaults standardUserDefaults] integerForKey:PositionKey(name)];
 }
 
+static NSString *OrderKey(NSString *name) {
+    return [NSString stringWithFormat:@"YTVideoOverlay-%@-Order", name];
+}
+
+static int ButtonOrder(NSString *name) {
+    return [[NSUserDefaults standardUserDefaults] integerForKey:OrderKey(name)];
+}
+
 static BOOL UseTopButton(NSString *name) {
     return TweakEnabled(name) && ButtonPosition(name) == 0;
 }
@@ -67,7 +75,6 @@ static void setDefaultTextStyle(YTQTMButton *button) {
         ? [defaultTypeStyle ytSansFontOfSize:10 weight:UIFontWeightSemibold]
         : [defaultTypeStyle fontOfSize:10 weight:UIFontWeightSemibold];
     button.titleLabel.font = font;
-    button.titleLabel.numberOfLines = 3;
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
 
@@ -79,8 +86,6 @@ static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *s
         button = [%c(YTQTMButton) textButton];
         button.accessibilityLabel = accessibilityLabel;
         button.verticalContentPadding = padding;
-        [button setTitle:@"Auto" forState:0];
-        [button sizeToFit];
         setDefaultTextStyle(button);
     } else {
         UIImage *image = [self buttonImage:buttonId];
@@ -156,6 +161,20 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
     return overlayButtons;
 }
 
+static void sortButtons(NSMutableArray <NSString *> *buttons) {
+    [buttons sortUsingComparator:^NSComparisonResult (NSString *a, NSString *b) {
+        int orderA = ButtonOrder(a);
+        int orderB = ButtonOrder(b);
+        if (orderA == 0 && orderB == 0)
+            return [a caseInsensitiveCompare:b];
+        if (orderA == 0)
+            return NSOrderedDescending;
+        if (orderB == 0)
+            return NSOrderedAscending;
+        return orderA < orderB ? NSOrderedAscending : NSOrderedDescending;
+    }];
+}
+
 %hook YTMainAppControlsOverlayView
 
 %property (retain, nonatomic) NSMutableDictionary *overlayButtons;
@@ -163,12 +182,14 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
 - (id)initWithDelegate:(id)delegate {
     self = %orig;
     self.overlayButtons = createOverlayButtons(YES, self);
+    sortButtons(topButtons);
     return self;
 }
 
 - (id)initWithDelegate:(id)delegate autoplaySwitchEnabled:(BOOL)autoplaySwitchEnabled {
     self = %orig;
     self.overlayButtons = createOverlayButtons(YES, self);
+    sortButtons(topButtons);
     return self;
 }
 
@@ -205,6 +226,7 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
 - (id)init {
     self = %orig;
     self.overlayButtons = createOverlayButtons(NO, self);
+    sortButtons(bottomButtons);
     return self;
 }
 
@@ -353,7 +375,8 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
     NSBundle *tweakBundle = TweakBundle(@"YTVideoOverlay");
     Class YTSettingsSectionItemClass = %c(YTSettingsSectionItem);
     YTSettingsViewController *settingsViewController = [self valueForKey:@"_settingsViewControllerDelegate"];
-    for (NSString *name in [tweaksMetadata allKeys]) {
+    NSArray <NSString *> *sortedKeys = [[tweaksMetadata allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    for (NSString *name in sortedKeys) {
         NSBundle *bundle = TweakBundle(name);
         YTSettingsSectionItem *header = [YTSettingsSectionItemClass itemWithTitle:name
             accessibilityIdentifier:nil
@@ -373,19 +396,21 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
                 settingItemId:0];
             [sectionItems addObject:master];
         }
+        NSString *topText = LOC(@"TOP");
+        NSString *bottomText = LOC(@"BOTTOM");
         YTSettingsSectionItem *position = [YTSettingsSectionItemClass itemWithTitle:_LOC(bundle, @"POSITION")
             accessibilityIdentifier:nil
             detailTextBlock:^NSString *() {
-                return ButtonPosition(name) ? LOC(@"BOTTOM") : LOC(@"TOP");
+                return ButtonPosition(name) ? bottomText : topText;
             }
             selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
                 NSArray <YTSettingsSectionItem *> *rows = @[
-                    [YTSettingsSectionItemClass checkmarkItemWithTitle:LOC(@"TOP") titleDescription:LOC(@"TOP_DESC") selectBlock:^BOOL (YTSettingsCell *top, NSUInteger arg1) {
+                    [YTSettingsSectionItemClass checkmarkItemWithTitle:topText titleDescription:LOC(@"TOP_DESC") selectBlock:^BOOL (YTSettingsCell *top, NSUInteger arg1) {
                         [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:PositionKey(name)];
                         [settingsViewController reloadData];
                         return YES;
                     }],
-                    [YTSettingsSectionItemClass checkmarkItemWithTitle:LOC(@"BOTTOM") titleDescription:LOC(@"BOTTOM_DESC") selectBlock:^BOOL (YTSettingsCell *bottom, NSUInteger arg1) {
+                    [YTSettingsSectionItemClass checkmarkItemWithTitle:bottomText titleDescription:LOC(@"BOTTOM_DESC") selectBlock:^BOOL (YTSettingsCell *bottom, NSUInteger arg1) {
                         [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:PositionKey(name)];
                         [settingsViewController reloadData];
                         return YES;
@@ -396,6 +421,41 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
                 return YES;
             }];
         [sectionItems addObject:position];
+        int orderValue = ButtonOrder(name);
+        NSString *orderText = LOC(@"ORDER");
+        NSString *orderNoneText = LOC(@"ORDER_NONE");
+        YTSettingsSectionItem *order = [YTSettingsSectionItemClass itemWithTitle:orderText
+            accessibilityIdentifier:nil
+            detailTextBlock:^NSString *() {
+                return orderValue ? [NSString stringWithFormat:@"%d", orderValue] : orderNoneText;
+            }
+            selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                int count = tweaksMetadata.count;
+                NSMutableArray <YTSettingsSectionItem *> *rows = [NSMutableArray arrayWithCapacity:count + 1];
+                [rows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:orderNoneText titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:OrderKey(name)];
+                    [settingsViewController reloadData];
+                    sortButtons(topButtons);
+                    sortButtons(bottomButtons);
+                    return YES;
+                }]];
+                for (int i = 0; i < count; ++i) {
+                    [rows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:[NSString stringWithFormat:@"%d", i + 1] titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                        [[NSUserDefaults standardUserDefaults] setInteger:i + 1 forKey:OrderKey(name)];
+                        [settingsViewController reloadData];
+                        sortButtons(topButtons);
+                        sortButtons(bottomButtons);
+                        return YES;
+                    }]];
+                }
+                int selectedItemIndex = orderValue;
+                if (selectedItemIndex >= count) selectedItemIndex = 0;
+                NSString *pickerTitle = [NSString stringWithFormat:@"%@ - %@", orderText, name];
+                YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:pickerTitle pickerSectionTitle:nil rows:rows selectedItemIndex:selectedItemIndex parentResponder:[self parentResponder]];
+                [settingsViewController pushViewController:picker];
+                return YES;
+            }];
+        [sectionItems addObject:order];
     }
     NSString *title = LOC(@"VIDEO_OVERLAY");
     if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)]) {

@@ -5,3 +5,5 @@
 "TOP_DESC" = "Sağ üstte, otomatik oynatma, altyazılar, yayınlama ve taşma menüsünün bulunduğu yer.";
 "BOTTOM" = "Alt";
 "BOTTOM_DESC" = "Sağ altta, tam ekran düğmesinin olduğu yer.";
+"ORDER" = "Sıra";
+"ORDER_NONE" = "Belirtilmemiş";
