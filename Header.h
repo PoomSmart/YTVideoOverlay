@@ -3,8 +3,6 @@
 #import <YouTubeHeader/YTMainAppControlsOverlayView.h>
 #import <YouTubeHeader/YTQTMButton.h>
 #import <YouTubeHeader/YTSettingsSectionItemManager.h>
-#import <dlfcn.h>
-#import <rootless.h>
 
 @interface YTSettingsSectionItemManager (YTVideoOverlay)
 - (void)updateYTVideoOverlaySectionWithEntry:(id)entry;
@@ -22,3 +20,5 @@
 
 #define _LOC(b, x) [b localizedStringForKey:x value:nil table:nil]
 #define LOC(x) _LOC(tweakBundle, x)
+
+#define OVERLAY_BUTTON_SIZE 24

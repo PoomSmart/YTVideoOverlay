@@ -18,9 +18,11 @@ NSMutableArray <NSString *> *bottomButtons;
 
 static NSBundle *TweakBundle(NSString *name) {
     NSString *tweakBundlePath = [[NSBundle mainBundle] pathForResource:name ofType:@"bundle"];
-    return tweakBundlePath
-        ? [NSBundle bundleWithPath:tweakBundlePath]
-        : [NSBundle bundleWithPath:[NSString stringWithFormat:ROOT_PATH_NS(@"/Library/Application Support/%@.bundle"), name]];
+#if TARGET_OS_SIMULATOR
+    return [NSBundle bundleWithPath:tweakBundlePath ?: [NSString stringWithFormat:realPath(@"/Library/Application Support/%@.bundle"), name]];
+#else
+    return [NSBundle bundleWithPath:tweakBundlePath ?: [NSString stringWithFormat:ROOT_PATH_NS(@"/Library/Application Support/%@.bundle"), name]];
+#endif
 }
 
 static NSString *EnabledKey(NSString *name) {
@@ -71,6 +73,9 @@ static void setDefaultTextStyle(YTQTMButton *button) {
         : [defaultTypeStyle fontOfSize:10 weight:UIFontWeightSemibold];
     button.titleLabel.font = font;
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
+    CGRect frame = button.frame;
+    frame.size.width = OVERLAY_BUTTON_SIZE;
+    button.frame = frame;
 }
 
 static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
