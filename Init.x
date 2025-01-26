@@ -6,7 +6,7 @@ static void initYTVideoOverlay(NSString *tweakKey, NSDictionary *metadata) {
 #if TARGET_OS_SIMULATOR
     dlopen(realPath2(@"/Library/MobileSubstrate/DynamicLibraries/YTVideoOverlay.dylib"), RTLD_LAZY);
 #else
-    dlopen(ROOT_PATH("/Library/MobileSubstrate/DynamicLibraries/YTVideoOverlay.dylib"), RTLD_LAZY);
+    dlopen(PS_ROOT_PATH("/Library/MobileSubstrate/DynamicLibraries/YTVideoOverlay.dylib"), RTLD_LAZY);
 #endif
     [NSClassFromString(@"YTSettingsSectionItemManager") registerTweak:tweakKey metadata:metadata];
 }
