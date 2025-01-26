@@ -421,34 +421,28 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 return YES;
             }];
         [sectionItems addObject:position];
-        int orderValue = ButtonOrder(name);
         NSString *orderText = LOC(@"ORDER");
         NSString *orderNoneText = LOC(@"ORDER_NONE");
         YTSettingsSectionItem *order = [YTSettingsSectionItemClass itemWithTitle:orderText
             accessibilityIdentifier:nil
             detailTextBlock:^NSString *() {
+                int orderValue = ButtonOrder(name);
                 return orderValue ? [NSString stringWithFormat:@"%d", orderValue] : orderNoneText;
             }
             selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
                 int count = tweaksMetadata.count;
                 NSMutableArray <YTSettingsSectionItem *> *rows = [NSMutableArray arrayWithCapacity:count + 1];
-                [rows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:orderNoneText titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
-                    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:OrderKey(name)];
-                    [settingsViewController reloadData];
-                    sortButtons(topButtons);
-                    sortButtons(bottomButtons);
-                    return YES;
-                }]];
-                for (int i = 0; i < count; ++i) {
-                    [rows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:[NSString stringWithFormat:@"%d", i + 1] titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
-                        [[NSUserDefaults standardUserDefaults] setInteger:i + 1 forKey:OrderKey(name)];
+                for (int i = 0; i <= count; ++i) {
+                    NSString *title = i == 0 ? orderNoneText : [NSString stringWithFormat:@"%d", i];
+                    [rows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:title titleDescription:nil selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                        [[NSUserDefaults standardUserDefaults] setInteger:i forKey:OrderKey(name)];
                         [settingsViewController reloadData];
                         sortButtons(topButtons);
                         sortButtons(bottomButtons);
                         return YES;
                     }]];
                 }
-                int selectedItemIndex = orderValue;
+                int selectedItemIndex = ButtonOrder(name);;
                 if (selectedItemIndex >= count) selectedItemIndex = 0;
                 NSString *pickerTitle = [NSString stringWithFormat:@"%@ - %@", orderText, name];
                 YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:pickerTitle pickerSectionTitle:nil rows:rows selectedItemIndex:selectedItemIndex parentResponder:[self parentResponder]];

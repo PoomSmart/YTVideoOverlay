@@ -1,6 +1,6 @@
 // Settings
 
-"VIDEO_OVERLAY" = "Video overlay";
+"VIDEO_OVERLAY" = "视频覆盖";
 "TOP" = "顶部";
 "TOP_DESC" = "在右上角，自动播放、字幕等按钮所在位置。";
 "BOTTOM" = "底部";
