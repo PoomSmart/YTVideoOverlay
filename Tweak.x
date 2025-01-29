@@ -384,7 +384,10 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
             selectBlock:nil];
         header.enabled = NO;
         [sectionItems addObject:header];
-        if (tweaksMetadata[name][ToggleKey] == nil) {
+        NSDictionary *metadata = tweaksMetadata[name];
+
+        // Toggle
+        if (metadata[ToggleKey] == nil) {
             YTSettingsSectionItem *master = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, @"ENABLED")
                 titleDescription:nil
                 accessibilityIdentifier:nil
@@ -396,6 +399,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 settingItemId:0];
             [sectionItems addObject:master];
         }
+
+        // Position
         NSString *topText = LOC(@"TOP");
         NSString *bottomText = LOC(@"BOTTOM");
         YTSettingsSectionItem *position = [YTSettingsSectionItemClass itemWithTitle:_LOC(bundle, @"POSITION")
@@ -421,6 +426,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 return YES;
             }];
         [sectionItems addObject:position];
+
+        // Order
         NSString *orderText = LOC(@"ORDER");
         NSString *orderNoneText = LOC(@"ORDER_NONE");
         YTSettingsSectionItem *order = [YTSettingsSectionItemClass itemWithTitle:orderText
@@ -450,6 +457,24 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 return YES;
             }];
         [sectionItems addObject:order];
+
+        // Extra boolean settings
+        if (metadata[ExtraBooleanKeys]) {
+            for (NSString *key in metadata[ExtraBooleanKeys]) {
+                NSString *titleKey = [NSString stringWithFormat:@"%@_KEY", key];
+                NSString *descriptionKey = [NSString stringWithFormat:@"%@_KEY_DESC", key];
+                YTSettingsSectionItem *extra = [YTSettingsSectionItemClass switchItemWithTitle:_LOC(bundle, titleKey)
+                    titleDescription:_LOC(bundle, descriptionKey)
+                    accessibilityIdentifier:nil
+                    switchOn:[[NSUserDefaults standardUserDefaults] boolForKey:key]
+                    switchBlock:^BOOL (YTSettingsCell *cell, BOOL enabled) {
+                        [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:key];
+                        return YES;
+                    }
+                    settingItemId:0];
+                [sectionItems addObject:extra];
+            }
+        }
     }
     NSString *title = LOC(@"VIDEO_OVERLAY");
     if ([settingsViewController respondsToSelector:@selector(setSectionItems:forCategory:title:icon:titleDescription:headerHidden:)]) {

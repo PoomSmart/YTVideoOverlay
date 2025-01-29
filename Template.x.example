@@ -53,9 +53,20 @@
     initYTVideoOverlay(TweakKey, @{
         AccessibilityLabelKey: @"Tweak",
         SelectorKey: @"didPressTweak:",
-        // AsTextKey: @YES, // If yes, the button is rendered as a text button
-        // ToggleKey: @YES, // If yes, the toggle setting is hidden from YTVideoOverlay settings
-        // UpdateImageOnVisibleKey: @YES, // If yes, the button image is assigned again when the button is visible
+        /* If yes, the button is rendered as a text button */
+        // AsTextKey: @YES,
+
+        /* If yes, the toggle setting is hidden from YTVideoOverlay settings */
+        // ToggleKey: @YES,
+
+        /* If yes, the button image is assigned again when the button is visible */
+        // UpdateImageOnVisibleKey: @YES,
+
+        /**
+         * Provide the keys of extra boolean settings for this tweak
+         * For localization, the setting title is in "{SETTING}_KEY" format and the setting description is in "{SETTING}_KEY_DESC" format
+         */
+        // ExtraBooleanKeys: @[SettingKey1, SettingKey2, ...],
     });
     %init(Top);
     %init(Bottom);
