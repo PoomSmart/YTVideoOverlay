@@ -18,11 +18,7 @@ NSMutableArray <NSString *> *bottomButtons;
 
 static NSBundle *TweakBundle(NSString *name) {
     NSString *tweakBundlePath = [[NSBundle mainBundle] pathForResource:name ofType:@"bundle"];
-#if TARGET_OS_SIMULATOR
-    return [NSBundle bundleWithPath:tweakBundlePath ?: [NSString stringWithFormat:realPath(@"/Library/Application Support/%@.bundle"), name]];
-#else
     return [NSBundle bundleWithPath:tweakBundlePath ?: [NSString stringWithFormat:PS_ROOT_PATH_NS(@"/Library/Application Support/%@.bundle"), name]];
-#endif
 }
 
 static NSString *EnabledKey(NSString *name) {
