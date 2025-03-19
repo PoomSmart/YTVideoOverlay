@@ -23,7 +23,7 @@
 %new(v@:@)
 - (void)didPressTweak:(id)arg {
     // Do stuff
-    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:0];
+    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:UIControlStateNormal];
 }
 
 %end
@@ -42,7 +42,7 @@
 %new(v@:@)
 - (void)didPressTweak:(id)arg {
     // Do stuff
-    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:0];
+    [self.overlayButtons[TweakKey] setImage:<Another Tweak Button Image> forState:UIControlStateNormal];
 }
 
 %end

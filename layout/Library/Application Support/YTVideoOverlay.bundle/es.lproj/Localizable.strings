@@ -1,5 +1,3 @@
-// Settings
-
 "VIDEO_OVERLAY" = "Superposición de video";
 "TOP" = "Arriba";
 "TOP_DESC" = "En la parte superior derecha, donde están la reproducción automática, los subtítulos, el reparto y el menú de desbordamiento.";

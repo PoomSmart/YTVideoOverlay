@@ -62,7 +62,7 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
 }
 
 static void setDefaultTextStyle(YTQTMButton *button) {
-    [button setTitleColor:[%c(YTColor) white1] forState:0];
+    [button setTitleColor:[%c(YTColor) white1] forState:UIControlStateNormal];
     YTDefaultTypeStyle *defaultTypeStyle = [%c(YTTypeStyle) defaultTypeStyle];
     UIFont *font = [defaultTypeStyle respondsToSelector:@selector(ytSansFontOfSize:weight:)]
         ? [defaultTypeStyle ytSansFontOfSize:10 weight:UIFontWeightSemibold]
@@ -110,7 +110,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     } else {
         UIImage *image = [self buttonImage:buttonId];
         button = [%c(YTQTMButton) iconButton];
-        [button setImage:image forState:0];
+        [button setImage:image forState:UIControlStateNormal];
         [button sizeToFit];
     }
     button.hidden = YES;
@@ -249,7 +249,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
             YTQTMButton *button = self.overlayButtons[name];
             button.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
-                [button setImage:[self buttonImage:name] forState:0];
+                [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
         }
     }
 }
@@ -261,7 +261,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
             YTQTMButton *button = self.overlayButtons[name];
             button.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
-                [button setImage:[self buttonImage:name] forState:0];
+                [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
         }
     }
 }
@@ -316,9 +316,19 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     }
     if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y < -4) return;
     frame.origin.x -= shift;
+    UIView *peekableView = [self peekableView];
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            self.overlayButtons[name].frame = frame;
+            YTQTMButton *button = self.overlayButtons[name];
+            if (self.layout == 3 && button.superview == self) {
+                [button removeFromSuperview];
+                [peekableView addSubview:button];
+            }
+            if (self.layout != 3 && button.superview == peekableView) {
+                [button removeFromSuperview];
+                [self addSubview:button];
+            }
+            button.frame = frame;
             frame.origin.x -= (2 * frame.size.width);
             if (frame.origin.x < 0) frame.origin.x = 0;
         }
