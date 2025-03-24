@@ -302,20 +302,24 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     CGFloat multiFeedWidth = [self respondsToSelector:@selector(multiFeedElementView)] ? [self multiFeedElementView].frame.size.width : 0;
     YTQTMButton *enter = [self enterFullscreenButton];
-    CGFloat shift = 0;
+    CGFloat fullscreenButtonWidth = 0;
+    CGFloat fullscreenImageWidth = 0;
     CGRect frame = CGRectZero;
     if ([enter yt_isVisible]) {
         frame = enter.frame;
-        shift = multiFeedWidth + (2 * frame.size.width);
+        fullscreenButtonWidth = frame.size.width;
+        fullscreenImageWidth = enter.currentImage.size.width;
     } else {
         YTQTMButton *exit = [self exitFullscreenButton];
         if ([exit yt_isVisible]) {
             frame = exit.frame;
-            shift = multiFeedWidth + (2 * frame.size.width);
+            fullscreenButtonWidth = frame.size.width;
+            fullscreenImageWidth = exit.currentImage.size.width;
         }
     }
     if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y < -4) return;
-    frame.origin.x -= shift;
+    CGFloat gap = fullscreenButtonWidth > fullscreenImageWidth ? 12 : fullscreenButtonWidth;
+    frame.origin.x -= gap + multiFeedWidth + fullscreenButtonWidth;
     UIView *peekableView = [self peekableView];
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
@@ -329,7 +333,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 [self addSubview:button];
             }
             button.frame = frame;
-            frame.origin.x -= (2 * frame.size.width);
+            frame.origin.x -= frame.size.width + gap;
             if (frame.origin.x < 0) frame.origin.x = 0;
         }
     }
