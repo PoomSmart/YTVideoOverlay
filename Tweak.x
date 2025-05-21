@@ -62,16 +62,14 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
 }
 
 static void setDefaultTextStyle(YTQTMButton *button) {
-    [button setTitleColor:[%c(YTColor) white1] forState:UIControlStateNormal];
+    button.customTitleColor = [%c(YTColor) white1];
     YTDefaultTypeStyle *defaultTypeStyle = [%c(YTTypeStyle) defaultTypeStyle];
     UIFont *font = [defaultTypeStyle respondsToSelector:@selector(ytSansFontOfSize:weight:)]
         ? [defaultTypeStyle ytSansFontOfSize:10 weight:UIFontWeightSemibold]
-        : [defaultTypeStyle fontOfSize:10 weight:UIFontWeightSemibold];
+        : [defaultTypeStyle fontOfSize:9.5 weight:UIFontWeightSemibold];
     button.titleLabel.font = font;
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
-    CGRect frame = button.frame;
-    frame.size.width = OVERLAY_BUTTON_SIZE;
-    button.frame = frame;
+    [button yt_setWidth:OVERLAY_BUTTON_SIZE];
 }
 
 static YTQTMButton *createButtonTop(BOOL isText, YTMainAppControlsOverlayView *self, NSString *buttonId, NSString *accessibilityLabel, SEL selector) {
