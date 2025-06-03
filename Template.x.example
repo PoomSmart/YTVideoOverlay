@@ -1,7 +1,7 @@
 #import "../YTVideoOverlay/Header.h"
 #import "../YTVideoOverlay/Init.x"
 
-#define TweakKey "TweakKey"
+#define TweakKey @"TweakKey"
 
 @interface YTInlinePlayerBarContainerView (Tweak)
 - (void)didPressTweak:(id)arg;
