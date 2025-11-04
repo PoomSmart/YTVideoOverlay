@@ -5,3 +5,7 @@
 "BOTTOM_DESC" = "ที่ด้านล่างขวา ที่มีปุ่มเต็มหน้าจอ";
 "ORDER" = "ลำดับ";
 "ORDER_NONE" = "ไม่ระบุ";
+
+"GLOBAL_SETTINGS" = "การตั้งค่าทั่วไป";
+"ENABLE_FROSTED_GLASS_BOTTOM" = "กระจกฝ้าด้านล่าง";
+"ENABLE_FROSTED_GLASS_BOTTOM_DESC" = "เพิ่มเอฟเฟกต์กระจกฝ้าให้กับปุ่มด้านล่างเมื่อเปิดใช้งาน";

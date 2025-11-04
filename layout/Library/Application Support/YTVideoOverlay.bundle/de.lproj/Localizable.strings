@@ -5,3 +5,7 @@
 "BOTTOM_DESC" = "Unten rechts, wo sich die Schaltfläche für den Vollbildmodus befindet.";
 "ORDER" = "Bestellen";
 "ORDER_NONE" = "Nicht festgelegt";
+
+"GLOBAL_SETTINGS" = "Globale Einstellungen";
+"ENABLE_FROSTED_GLASS_BOTTOM" = "Unteres Milchglas";
+"ENABLE_FROSTED_GLASS_BOTTOM_DESC" = "Fügt den unteren Schaltflächen einen Milchglas-Effekt hinzu, wenn aktiviert.";

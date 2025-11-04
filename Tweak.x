@@ -1,4 +1,5 @@
 #import <YouTubeHeader/YTColor.h>
+#import <YouTubeHeader/YTFrostedGlassView.h>
 #import <YouTubeHeader/YTMainAppVideoPlayerOverlayViewController.h>
 #import <YouTubeHeader/YTQTMButton.h>
 #import <YouTubeHeader/YTSettingsGroupData.h>
@@ -12,9 +13,13 @@
 
 static const NSInteger YTVideoOverlaySection = 1222;
 
+static NSString *const FrostedGlassBottomKey = @"YTVideoOverlay-FrostedGlassBottom";
+
 NSMutableDictionary <NSString *, NSDictionary *> *tweaksMetadata;
 NSMutableArray <NSString *> *topButtons;
 NSMutableArray <NSString *> *bottomButtons;
+
+BOOL hasFrostedGlass = NO;
 
 static NSBundle *TweakBundle(NSString *name) {
     NSString *tweakBundlePath = [[NSBundle mainBundle] pathForResource:name ofType:@"bundle"];
@@ -27,6 +32,10 @@ static NSString *EnabledKey(NSString *name) {
 
 static BOOL TweakEnabled(NSString *name) {
     return [[NSUserDefaults standardUserDefaults] boolForKey:EnabledKey(name)];
+}
+
+static BOOL FrostedGlassEnabled() {
+    return hasFrostedGlass && [[NSUserDefaults standardUserDefaults] boolForKey:FrostedGlassBottomKey];
 }
 
 static NSString *PositionKey(NSString *name) {
@@ -59,6 +68,11 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
             [controls insertObject:self.overlayButtons[name] atIndex:0];
     }
     return controls;
+}
+
+static YTFrostedGlassView *createFrostedGlassView() {
+    NSInteger blurEffectStyle = [%c(YTFrostedGlassView) frostedGlassBlurEffectStyle];
+    return [[%c(YTFrostedGlassView) alloc] initWithBlurEffectStyle:blurEffectStyle alpha:1];
 }
 
 static void setDefaultTextStyle(YTQTMButton *button) {
@@ -115,6 +129,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     button.exclusiveTouch = YES;
     button.alpha = 0;
     button.minHitTargetSize = 60;
+    button.layer.cornerRadius = OVERLAY_BUTTON_SIZE / 2;
     button.accessibilityLabel = accessibilityLabel;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
     if (![bottomButtons containsObject:buttonId])
@@ -138,8 +153,8 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %end
 
-static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOOL isTop, id self) {
-    NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons = [NSMutableDictionary dictionary];
+static NSMutableDictionary <NSString *, UIView *> *createOverlayButtons(BOOL isTop, id self) {
+    NSMutableDictionary <NSString *, UIView *> *overlayButtons = [NSMutableDictionary dictionary];
     for (NSString *name in [tweaksMetadata allKeys]) {
         NSDictionary *metadata = tweaksMetadata[name];
         SEL selector = NSSelectorFromString(metadata[SelectorKey]);
@@ -151,6 +166,11 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
         else
             button = createButtonBottom(asText, (YTInlinePlayerBarContainerView *)self, name, accessibilityLabel, selector);
         overlayButtons[name] = button;
+        if (!isTop && FrostedGlassEnabled()) {
+            YTFrostedGlassView *frostedGlassView = createFrostedGlassView();
+            [frostedGlassView maybeApplyToView:button];
+            overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]] = frostedGlassView;
+        }
     }
     return overlayButtons;
 }
@@ -233,7 +253,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     NSMutableArray *icons = %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = self.overlayButtons[name];
+            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
             [icons insertObject:button atIndex:0];
         }
     }
@@ -244,7 +264,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = self.overlayButtons[name];
+            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
             button.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
                 [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
@@ -256,8 +276,11 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = self.overlayButtons[name];
+            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
             button.hidden = NO;
+            YTFrostedGlassView *frostedGlassView = (YTFrostedGlassView *)self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]];
+            if (frostedGlassView)
+                frostedGlassView.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
                 [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
         }
@@ -267,16 +290,20 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 - (void)hideScrubber {
     %orig;
     for (NSString *name in bottomButtons) {
-        if (UseBottomButton(name))
+        if (UseBottomButton(name)) {
             self.overlayButtons[name].alpha = 0;
+            self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]].alpha = 0;
+        }
     }
 }
 
 - (void)setPeekableViewVisible:(BOOL)visible {
     %orig;
     for (NSString *name in bottomButtons) {
-        if (UseBottomButton(name))
+        if (UseBottomButton(name)) {
             self.overlayButtons[name].alpha = visible ? 1 : 0;
+            self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]].alpha = visible ? 1 : 0;
+        }
     }
 }
 
@@ -321,14 +348,21 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     UIView *peekableView = [self peekableView];
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = self.overlayButtons[name];
+            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+            YTFrostedGlassView *frostedGlassView = (YTFrostedGlassView *)self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]];
             if (self.layout == 3 && button.superview == self) {
                 [button removeFromSuperview];
+                [frostedGlassView removeFromSuperview];
                 [peekableView addSubview:button];
+                if (frostedGlassView)
+                    [frostedGlassView maybeApplyToView:button];
             }
             if (self.layout != 3 && button.superview == peekableView) {
                 [button removeFromSuperview];
+                [frostedGlassView removeFromSuperview];
                 [self addSubview:button];
+                if (frostedGlassView)
+                    [frostedGlassView maybeApplyToView:button];
             }
             button.frame = frame;
             frame.origin.x -= frame.size.width + gap;
@@ -383,6 +417,29 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     NSBundle *tweakBundle = TweakBundle(@"YTVideoOverlay");
     Class YTSettingsSectionItemClass = %c(YTSettingsSectionItem);
     YTSettingsViewController *settingsViewController = [self valueForKey:@"_settingsViewControllerDelegate"];
+
+    if (hasFrostedGlass) {
+        YTSettingsSectionItem *enableFrostedGlass = [YTSettingsSectionItemClass switchItemWithTitle:LOC(@"ENABLE_FROSTED_GLASS_BOTTOM")
+            titleDescription:LOC(@"ENABLE_FROSTED_GLASS_BOTTOM_DESC")
+            accessibilityIdentifier:nil
+            switchOn:FrostedGlassEnabled()
+            switchBlock:^BOOL (YTSettingsCell *cell, BOOL enabled) {
+                [[NSUserDefaults standardUserDefaults] setBool:enabled forKey:FrostedGlassBottomKey];
+                return YES;
+            }
+            settingItemId:0];
+        [sectionItems addObject:enableFrostedGlass];
+    }
+
+    if (sectionItems.count) {
+        YTSettingsSectionItem *globalHeader = [YTSettingsSectionItemClass itemWithTitle:LOC(@"GLOBAL_SETTINGS")
+            accessibilityIdentifier:nil
+            detailTextBlock:nil
+            selectBlock:nil];
+        globalHeader.enabled = NO;
+        [sectionItems insertObject:globalHeader atIndex:0];
+    }
+
     NSArray <NSString *> *sortedKeys = [[tweaksMetadata allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     for (NSString *name in sortedKeys) {
         NSBundle *bundle = TweakBundle(name);
@@ -509,6 +566,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     tweaksMetadata = [NSMutableDictionary dictionary];
     topButtons = [NSMutableArray array];
     bottomButtons = [NSMutableArray array];
+    hasFrostedGlass = %c(YTFrostedGlassView) != nil;
     %init(Settings);
     %init(Top);
     %init(Bottom);

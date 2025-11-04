@@ -9,12 +9,12 @@
 @end
 
 @interface YTMainAppControlsOverlayView (YTVideoOverlay)
-@property (retain, nonatomic) NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons;
+@property (retain, nonatomic) NSMutableDictionary <NSString *, UIView *> *overlayButtons;
 - (UIImage *)buttonImage:(NSString *)tweakId;
 @end
 
 @interface YTInlinePlayerBarContainerView (YTVideoOverlay)
-@property (retain, nonatomic) NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons;
+@property (retain, nonatomic) NSMutableDictionary <NSString *, UIView *> *overlayButtons;
 - (UIImage *)buttonImage:(NSString *)tweakId;
 @end
 

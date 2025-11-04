@@ -5,3 +5,7 @@
 "BOTTOM_DESC" = "在右下方，也就是全螢幕按鈕所在的位置。";
 "ORDER" = "排序";
 "ORDER_NONE" = "未設定";
+
+"GLOBAL_SETTINGS" = "全域設定";
+"ENABLE_FROSTED_GLASS_BOTTOM" = "底部毛玻璃";
+"ENABLE_FROSTED_GLASS_BOTTOM_DESC" = "啟用後為底部按鈕添加毛玻璃效果。";

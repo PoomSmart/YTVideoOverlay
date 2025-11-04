@@ -5,3 +5,7 @@
 "BOTTOM_DESC" = "Ở phía dưới bên phải, nơi có nút toàn màn hình.";
 "ORDER" = "Thứ tự";
 "ORDER_NONE" = "Chưa đặt";
+
+"GLOBAL_SETTINGS" = "Cài đặt chung";
+"ENABLE_FROSTED_GLASS_BOTTOM" = "Kính mờ phía dưới";
+"ENABLE_FROSTED_GLASS_BOTTOM_DESC" = "Thêm hiệu ứng kính mờ cho các nút phía dưới khi được bật.";
