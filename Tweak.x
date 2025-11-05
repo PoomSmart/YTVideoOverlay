@@ -241,8 +241,12 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 
 - (void)setTopOverlayVisible:(BOOL)visible isAutonavCanceledState:(BOOL)canceledState {
     CGFloat alpha = canceledState || !visible ? 0.0 : 1.0;
-    for (NSString *name in topButtons)
-        self.overlayButtons[name].alpha = UseTopButton(name) ? alpha : 0;
+    for (NSString *name in topButtons) {
+        YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+        button.alpha = UseTopButton(name) ? alpha : 0;
+        if (tweaksMetadata[name][UpdateImageOnVisibleKey])
+            [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
+    }
     %orig;
 }
 
