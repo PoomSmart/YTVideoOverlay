@@ -19,6 +19,7 @@ NSMutableDictionary <NSString *, NSDictionary *> *tweaksMetadata;
 NSMutableArray <NSString *> *topButtons;
 NSMutableArray <NSString *> *bottomButtons;
 
+Class YTFrostedGlassViewClass;
 BOOL hasFrostedGlass = NO;
 
 static NSBundle *TweakBundle(NSString *name) {
@@ -71,8 +72,26 @@ static NSMutableArray *topControls(YTMainAppControlsOverlayView *self, NSMutable
 }
 
 static YTFrostedGlassView *createFrostedGlassView() {
-    NSInteger blurEffectStyle = [%c(YTFrostedGlassView) frostedGlassBlurEffectStyle];
-    return [[%c(YTFrostedGlassView) alloc] initWithBlurEffectStyle:blurEffectStyle alpha:1];
+    NSInteger blurEffectStyle = [YTFrostedGlassViewClass respondsToSelector:@selector(frostedGlassBlurEffectStyle)] ? [YTFrostedGlassViewClass frostedGlassBlurEffectStyle] : 17;
+    @try {
+        return [[YTFrostedGlassViewClass alloc] initWithBlurEffectStyle:blurEffectStyle alpha:1];
+    } @catch (id ex) {
+        return [[YTFrostedGlassViewClass alloc] initWithBlurEffectStyle:blurEffectStyle];
+    }
+}
+
+static void maybeApplyToView(YTFrostedGlassView *frostedGlassView, UIView *view) {
+    if ([frostedGlassView respondsToSelector:@selector(maybeApplyToView:)]) {
+        [frostedGlassView maybeApplyToView:view];
+        return;
+    }
+    if (!frostedGlassView || !view || frostedGlassView.superview == view) return;
+    UIColor *backgroundColor = [%c(YTColor) blackPureAlpha0];
+    view.layer.backgroundColor = backgroundColor.CGColor;
+    frostedGlassView.cornerRadius = view.layer.cornerRadius;
+    frostedGlassView.frame = view.bounds;
+    frostedGlassView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [view insertSubview:frostedGlassView atIndex:0];
 }
 
 static void setDefaultTextStyle(YTQTMButton *button) {
@@ -168,7 +187,7 @@ static NSMutableDictionary <NSString *, UIView *> *createOverlayButtons(BOOL isT
         overlayButtons[name] = button;
         if (!isTop && FrostedGlassEnabled()) {
             YTFrostedGlassView *frostedGlassView = createFrostedGlassView();
-            [frostedGlassView maybeApplyToView:button];
+            maybeApplyToView(frostedGlassView, button);
             overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]] = frostedGlassView;
         }
     }
@@ -354,15 +373,13 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 [button removeFromSuperview];
                 [frostedGlassView removeFromSuperview];
                 [peekableView addSubview:button];
-                if (frostedGlassView)
-                    [frostedGlassView maybeApplyToView:button];
+                maybeApplyToView(frostedGlassView, button);
             }
             if (self.layout != 3 && button.superview == peekableView) {
                 [button removeFromSuperview];
                 [frostedGlassView removeFromSuperview];
                 [self addSubview:button];
-                if (frostedGlassView)
-                    [frostedGlassView maybeApplyToView:button];
+                maybeApplyToView(frostedGlassView, button);
             }
             button.frame = frame;
             frame.origin.x -= frame.size.width + gap;
@@ -566,7 +583,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     tweaksMetadata = [NSMutableDictionary dictionary];
     topButtons = [NSMutableArray array];
     bottomButtons = [NSMutableArray array];
-    hasFrostedGlass = %c(YTFrostedGlassView) != nil;
+    YTFrostedGlassViewClass = objc_getClass("YTFrostedGlassView");
+    hasFrostedGlass = YTFrostedGlassViewClass != nil;
     %init(Settings);
     %init(Top);
     %init(Bottom);
