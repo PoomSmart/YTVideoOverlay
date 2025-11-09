@@ -172,8 +172,9 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
 
 %end
 
-static NSMutableDictionary <NSString *, UIView *> *createOverlayButtons(BOOL isTop, id self) {
-    NSMutableDictionary <NSString *, UIView *> *overlayButtons = [NSMutableDictionary dictionary];
+static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOOL isTop, id self) {
+    NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons = [NSMutableDictionary dictionary];
+    NSMutableDictionary <NSString *, YTFrostedGlassView *> *overlayGlasses = isTop ? nil : [NSMutableDictionary dictionary];
     for (NSString *name in [tweaksMetadata allKeys]) {
         NSDictionary *metadata = tweaksMetadata[name];
         SEL selector = NSSelectorFromString(metadata[SelectorKey]);
@@ -188,7 +189,7 @@ static NSMutableDictionary <NSString *, UIView *> *createOverlayButtons(BOOL isT
         if (!isTop && FrostedGlassEnabled()) {
             YTFrostedGlassView *frostedGlassView = createFrostedGlassView();
             maybeApplyToView(frostedGlassView, button);
-            overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]] = frostedGlassView;
+            overlayGlasses[name] = frostedGlassView;
         }
     }
     return overlayButtons;
@@ -242,7 +243,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 - (void)setTopOverlayVisible:(BOOL)visible isAutonavCanceledState:(BOOL)canceledState {
     CGFloat alpha = canceledState || !visible ? 0.0 : 1.0;
     for (NSString *name in topButtons) {
-        YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+        YTQTMButton *button = self.overlayButtons[name];
         button.alpha = UseTopButton(name) ? alpha : 0;
         if (tweaksMetadata[name][UpdateImageOnVisibleKey])
             [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
@@ -259,6 +260,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 %hook YTInlinePlayerBarContainerView
 
 %property (retain, nonatomic) NSMutableDictionary *overlayButtons;
+%property (retain, nonatomic) NSMutableDictionary *overlayGlasses;
 
 - (id)init {
     self = %orig;
@@ -276,7 +278,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     NSMutableArray *icons = %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+            YTQTMButton *button = self.overlayButtons[name];
             [icons insertObject:button atIndex:0];
         }
     }
@@ -287,7 +289,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+            YTQTMButton *button = self.overlayButtons[name];
             button.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
                 [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
@@ -299,9 +301,9 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
+            YTQTMButton *button = self.overlayButtons[name];
             button.hidden = NO;
-            YTFrostedGlassView *frostedGlassView = (YTFrostedGlassView *)self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]];
+            YTFrostedGlassView *frostedGlassView = self.overlayGlasses[name];
             if (frostedGlassView)
                 frostedGlassView.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
@@ -315,17 +317,18 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
             self.overlayButtons[name].alpha = 0;
-            self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]].alpha = 0;
+            self.overlayGlasses[name].alpha = 0;
         }
     }
 }
 
 - (void)setPeekableViewVisible:(BOOL)visible {
     %orig;
+    CGFloat alpha = visible ? 1 : 0;
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            self.overlayButtons[name].alpha = visible ? 1 : 0;
-            self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]].alpha = visible ? 1 : 0;
+            self.overlayButtons[name].alpha = alpha;
+            self.overlayGlasses[name].alpha = alpha;
         }
     }
 }
@@ -371,8 +374,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     UIView *peekableView = [self peekableView];
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
-            YTQTMButton *button = (YTQTMButton *)self.overlayButtons[name];
-            YTFrostedGlassView *frostedGlassView = (YTFrostedGlassView *)self.overlayButtons[[NSString stringWithFormat:@"%@_FrostedGlass", name]];
+            YTQTMButton *button = self.overlayButtons[name];
+            YTFrostedGlassView *frostedGlassView = self.overlayGlasses[name];
             if (self.layout == 3 && button.superview == self) {
                 [button removeFromSuperview];
                 [frostedGlassView removeFromSuperview];
