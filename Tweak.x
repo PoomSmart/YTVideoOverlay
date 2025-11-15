@@ -148,7 +148,7 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     button.exclusiveTouch = YES;
     button.alpha = 0;
     button.minHitTargetSize = 60;
-    button.layer.cornerRadius = OVERLAY_BUTTON_SIZE / 2;
+    button.layer.cornerRadius = 18;
     button.accessibilityLabel = accessibilityLabel;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
     if (![bottomButtons containsObject:buttonId])
