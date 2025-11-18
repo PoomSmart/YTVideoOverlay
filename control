@@ -1,6 +1,6 @@
 Package: com.ps.ytvideooverlay
 Name: YTVideoOverlay
-Version: 2.3.4
+Version: 2.3.5
 Architecture: iphoneos-arm
 Description: A helper tweak to add buttons on YouTube video overlay.
 Maintainer: PoomSmart

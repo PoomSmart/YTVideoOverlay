@@ -148,7 +148,6 @@ static YTQTMButton *createButtonBottom(BOOL isText, YTInlinePlayerBarContainerVi
     button.exclusiveTouch = YES;
     button.alpha = 0;
     button.minHitTargetSize = 60;
-    button.layer.cornerRadius = 18;
     button.accessibilityLabel = accessibilityLabel;
     [button addTarget:self action:selector forControlEvents:UIControlEventTouchUpInside];
     if (![bottomButtons containsObject:buttonId])
@@ -188,10 +187,11 @@ static NSMutableDictionary <NSString *, YTQTMButton *> *createOverlayButtons(BOO
         overlayButtons[name] = button;
         if (!isTop && FrostedGlassEnabled()) {
             YTFrostedGlassView *frostedGlassView = createFrostedGlassView();
-            maybeApplyToView(frostedGlassView, button);
             overlayGlasses[name] = frostedGlassView;
         }
     }
+    if (!isTop)
+        ((YTInlinePlayerBarContainerView *)self).overlayGlasses = overlayGlasses;
     return overlayButtons;
 }
 
@@ -303,9 +303,6 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
         if (UseBottomButton(name)) {
             YTQTMButton *button = self.overlayButtons[name];
             button.hidden = NO;
-            YTFrostedGlassView *frostedGlassView = self.overlayGlasses[name];
-            if (frostedGlassView)
-                frostedGlassView.hidden = NO;
             if (tweaksMetadata[name][UpdateImageOnVisibleKey])
                 [button setImage:[self buttonImage:name] forState:UIControlStateNormal];
         }
@@ -315,10 +312,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 - (void)hideScrubber {
     %orig;
     for (NSString *name in bottomButtons) {
-        if (UseBottomButton(name)) {
+        if (UseBottomButton(name))
             self.overlayButtons[name].alpha = 0;
-            self.overlayGlasses[name].alpha = 0;
-        }
     }
 }
 
@@ -326,10 +321,8 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     CGFloat alpha = visible ? 1 : 0;
     for (NSString *name in bottomButtons) {
-        if (UseBottomButton(name)) {
+        if (UseBottomButton(name))
             self.overlayButtons[name].alpha = alpha;
-            self.overlayGlasses[name].alpha = alpha;
-        }
     }
 }
 
@@ -353,6 +346,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     %orig;
     CGFloat multiFeedWidth = [self respondsToSelector:@selector(multiFeedElementView)] ? [self multiFeedElementView].frame.size.width : 0;
     YTQTMButton *enter = [self enterFullscreenButton];
+    CGFloat cornerRadius = enter.layer.cornerRadius;
     CGFloat fullscreenButtonWidth = 0;
     CGFloat fullscreenImageWidth = 0;
     CGRect frame = CGRectZero;
@@ -363,6 +357,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     } else {
         YTQTMButton *exit = [self exitFullscreenButton];
         if ([exit yt_isVisible]) {
+            cornerRadius = exit.layer.cornerRadius;
             frame = exit.frame;
             fullscreenButtonWidth = frame.size.width;
             fullscreenImageWidth = exit.currentImage.size.width;
@@ -380,14 +375,14 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 [button removeFromSuperview];
                 [frostedGlassView removeFromSuperview];
                 [peekableView addSubview:button];
-                maybeApplyToView(frostedGlassView, button);
             }
             if (self.layout != 3 && button.superview == peekableView) {
                 [button removeFromSuperview];
                 [frostedGlassView removeFromSuperview];
                 [self addSubview:button];
-                maybeApplyToView(frostedGlassView, button);
             }
+            button.layer.cornerRadius = cornerRadius;
+            maybeApplyToView(frostedGlassView, button);
             button.frame = frame;
             frame.origin.x -= frame.size.width + gap;
             if (frame.origin.x < 0) frame.origin.x = 0;
