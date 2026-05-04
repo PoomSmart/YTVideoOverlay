@@ -533,7 +533,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                         return YES;
                     }]];
                 }
-                int selectedItemIndex = ButtonOrder(name);;
+                int selectedItemIndex = ButtonOrder(name);
                 if (selectedItemIndex >= count) selectedItemIndex = 0;
                 NSString *pickerTitle = [NSString stringWithFormat:@"%@ - %@", orderText, name];
                 YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:pickerTitle pickerSectionTitle:nil rows:rows selectedItemIndex:selectedItemIndex parentResponder:[self parentResponder]];
