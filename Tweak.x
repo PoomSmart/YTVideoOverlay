@@ -102,6 +102,11 @@ static void setDefaultTextStyle(YTQTMButton *button) {
         : [defaultTypeStyle fontOfSize:9.5 weight:UIFontWeightSemibold];
     button.titleLabel.font = font;
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    button.contentEdgeInsets = UIEdgeInsetsZero;
+#pragma clang diagnostic pop
+    button.sizeWithPaddingAndInsets = NO;
     [button yt_setWidth:OVERLAY_BUTTON_SIZE];
 }
 
