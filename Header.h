@@ -14,10 +14,15 @@
 - (UIImage *)buttonImage:(NSString *)tweakId;
 @end
 
+@interface YTEnterExitFullscreenButtonView : UIView
+- (YTQTMButton *)enterExitFullscreenButton;
+@end
+
 @interface YTInlinePlayerBarContainerView (YTVideoOverlay)
 @property (retain, nonatomic) NSMutableDictionary <NSString *, YTQTMButton *> *overlayButtons;
 @property (retain, nonatomic) NSMutableDictionary <NSString *, YTFrostedGlassView *> *overlayGlasses;
 - (UIImage *)buttonImage:(NSString *)tweakId;
+- (YTEnterExitFullscreenButtonView *)enterExitFullscreenButton; // iosSimplifyRightIcons
 @end
 
 #define _LOC(b, x) [b localizedStringForKey:x value:nil table:nil]

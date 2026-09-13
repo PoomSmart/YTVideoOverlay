@@ -357,6 +357,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     CGFloat fullscreenButtonWidth = 0;
     CGFloat fullscreenImageWidth = 0;
     CGRect frame = CGRectZero;
+    BOOL grouped = NO;
     if ([enter yt_isVisible]) {
         frame = enter.frame;
         fullscreenButtonWidth = frame.size.width;
@@ -368,9 +369,23 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
             frame = exit.frame;
             fullscreenButtonWidth = frame.size.width;
             fullscreenImageWidth = exit.currentImage.size.width;
+        } else if ([self respondsToSelector:@selector(enterExitFullscreenButton)]) {
+            // Simplified right icons
+            YTEnterExitFullscreenButtonView *enterExit = [self enterExitFullscreenButton];
+            UIView *group = enterExit.superview;
+            if (group && [enterExit yt_isVisible]) {
+                grouped = YES;
+                cornerRadius = enterExit.layer.cornerRadius;
+                frame = [group convertRect:enterExit.frame toView:self];
+                CGRect groupFrame = [group.superview convertRect:group.frame toView:self];
+                fullscreenButtonWidth = frame.size.width;
+                fullscreenImageWidth = [enterExit enterExitFullscreenButton].currentImage.size.width;
+                multiFeedWidth = CGRectGetMinX(frame) - CGRectGetMinX(groupFrame);
+            }
         }
     }
-    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || frame.origin.y < -4) return;
+    // The right icons group sits above the container's top edge
+    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || (!grouped && frame.origin.y < -4)) return;
     CGFloat gap = fullscreenButtonWidth > fullscreenImageWidth ? 12 : fullscreenButtonWidth;
     frame.origin.x -= gap + multiFeedWidth + fullscreenButtonWidth;
     UIView *peekableView = [self peekableView];
