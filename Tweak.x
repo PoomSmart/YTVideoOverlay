@@ -357,6 +357,7 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
     CGFloat fullscreenButtonWidth = 0;
     CGFloat fullscreenImageWidth = 0;
     CGRect frame = CGRectZero;
+    UIView *peekableView = [self peekableView];
     BOOL grouped = NO;
     if ([enter yt_isVisible]) {
         frame = enter.frame;
@@ -374,21 +375,19 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
             YTEnterExitFullscreenButtonView *enterExit = [self enterExitFullscreenButton];
             UIView *group = enterExit.superview;
             if (group && [enterExit yt_isVisible]) {
+                // Buttons are hosted by peekableView in fullscreen, so measure in that space
+                UIView *host = self.layout == 3 ? peekableView : self;
                 grouped = YES;
                 cornerRadius = enterExit.layer.cornerRadius;
-                frame = [group convertRect:enterExit.frame toView:self];
-                CGRect groupFrame = [group.superview convertRect:group.frame toView:self];
+                frame = [group convertRect:enterExit.frame toView:host];
+                CGRect groupFrame = [group.superview convertRect:group.frame toView:host];
                 fullscreenButtonWidth = frame.size.width;
                 fullscreenImageWidth = [enterExit enterExitFullscreenButton].currentImage.size.width;
                 multiFeedWidth = CGRectGetMinX(frame) - CGRectGetMinX(groupFrame);
             }
         }
     }
-    // The right icons group sits above the container's top edge
-    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || (!grouped && frame.origin.y < -4)) return;
-    CGFloat gap = fullscreenButtonWidth > fullscreenImageWidth ? 12 : fullscreenButtonWidth;
-    frame.origin.x -= gap + multiFeedWidth + fullscreenButtonWidth;
-    UIView *peekableView = [self peekableView];
+    // Move buttons between hosts before any early return so none stay in the hidden peekableView
     for (NSString *name in bottomButtons) {
         if (UseBottomButton(name)) {
             YTQTMButton *button = self.overlayButtons[name];
@@ -403,6 +402,16 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
                 [frostedGlassView removeFromSuperview];
                 [self addSubview:button];
             }
+        }
+    }
+    // The group may sit above the container's top edge
+    if (CGRectIsEmpty(frame) || frame.origin.x <= 0 || (!grouped && frame.origin.y < -4)) return;
+    CGFloat gap = fullscreenButtonWidth > fullscreenImageWidth ? 12 : fullscreenButtonWidth;
+    frame.origin.x -= gap + multiFeedWidth + fullscreenButtonWidth;
+    for (NSString *name in bottomButtons) {
+        if (UseBottomButton(name)) {
+            YTQTMButton *button = self.overlayButtons[name];
+            YTFrostedGlassView *frostedGlassView = self.overlayGlasses[name];
             button.layer.cornerRadius = cornerRadius;
             maybeApplyToView(frostedGlassView, button);
             button.frame = frame;
