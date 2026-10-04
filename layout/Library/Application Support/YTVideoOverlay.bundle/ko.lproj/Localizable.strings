@@ -1,0 +1,11 @@
+"VIDEO_OVERLAY" = "동영상 오버레이";
+"TOP" = "상단";
+"TOP_DESC" = "자동 재생, 자막, 전송 및 더보기 메뉴가 있는 우측 상단입니다.";
+"BOTTOM" = "하단";
+"BOTTOM_DESC" = "전체화면 버튼이 있는 우측 하단입니다.";
+"ORDER" = "순서";
+"ORDER_NONE" = "지정 안 됨";
+
+"GLOBAL_SETTINGS" = "전역 설정";
+"ENABLE_FROSTED_GLASS_BOTTOM" = "하단 반투명 유리 효과";
+"ENABLE_FROSTED_GLASS_BOTTOM_DESC" = "활성화하면 하단 버튼에 반투명 유리 효과를 적용합니다.";
