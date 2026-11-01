@@ -264,6 +264,12 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 
 %group Bottom
 
+static void initializeBottomOverlay(YTInlinePlayerBarContainerView *view) {
+    if (!view || view.overlayButtons) return;
+    view.overlayButtons = createOverlayButtons(NO, view);
+    sortButtons(bottomButtons);
+}
+
 %hook YTInlinePlayerBarContainerView
 
 %property (retain, nonatomic) NSMutableDictionary *overlayButtons;
@@ -271,8 +277,13 @@ static void sortButtons(NSMutableArray <NSString *> *buttons) {
 
 - (id)init {
     self = %orig;
-    self.overlayButtons = createOverlayButtons(NO, self);
-    sortButtons(bottomButtons);
+    initializeBottomOverlay(self);
+    return self;
+}
+
+- (id)initWithParentResponder:(id)parentResponder {
+    self = %orig;
+    initializeBottomOverlay(self);
     return self;
 }
 
